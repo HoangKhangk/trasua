@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý – Trà Sữa Mẹ nấu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="admin-page">
+
+<!-- ======================== LOGIN SCREEN ======================== -->
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-box">
+    <div class="admin-login-logo">🧋</div>
+    <h1 class="admin-login-title">Quản lý quán</h1>
+    <p class="admin-login-sub">Nhập mật khẩu để đăng nhập</p>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
+    </div>
+    <button class="login-btn" id="loginBtn">
+      <i data-lucide="log-in"></i> Đăng nhập
+    </button>
+    <p style="text-align:center;font-size:12px;color:var(--a-gray);margin-top:14px">Mật khẩu mặc định: <strong>admin123</strong></p>
+  </div>
+</div>
+
+<!-- ======================== ADMIN WRAPPER ======================== -->
+<div id="adminWrapper" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo-icon">🧋</span>
+      <span class="sidebar-logo-text">Trà Sữa Mẹ nấu</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item active" data-section="dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="sidebar-nav-item" data-section="orders">
+        <i data-lucide="receipt"></i>
+        <span>Đơn hàng</span>
+        <span class="sidebar-badge" id="sidebarOrderBadge" style="display:none">0</span>
+      </button>
+      <button class="sidebar-nav-item" data-section="menu">
+        <i data-lucide="utensils"></i>
+        <span>Thực đơn</span>
+      </button>
+      <button class="sidebar-nav-item" data-section="categories">
+        <i data-lucide="tag"></i>
+        <span>Danh mục</span>
+      </button>
+      <button class="sidebar-nav-item" data-section="stats">
+        <i data-lucide="bar-chart-2"></i>
+        <span>Thống kê</span>
+      </button>
+      <button class="sidebar-nav-item" data-section="settings">
+        <i data-lucide="settings"></i>
+        <span>Cài đặt</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html" class="sidebar-store-link">
+        <i data-lucide="store"></i>
+        <span>Xem quán</span>
+      </a>
+      <button class="sidebar-logout-btn" id="adminLogout">
+        <i data-lucide="log-out"></i>
+        <span>Đăng xuất</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- HAMBURGER (mobile) -->
+  <button class="hamburger" id="hamburger" aria-label="Mở menu">
+    <i data-lucide="menu"></i>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-section="dashboard">
+      <i data-lucide="layout-dashboard"></i>
+      <span>Tổng quan</span>
+    </button>
+    <button class="bottom-nav-item" data-section="orders">
+      <i data-lucide="receipt"></i>
+      <span>Đơn hàng</span>
+      <span class="bottom-nav-badge" id="bottomOrderBadge" style="display:none">0</span>
+    </button>
+    <button class="bottom-nav-item" data-section="menu">
+      <i data-lucide="utensils"></i>
+      <span>Thực đơn</span>
+    </button>
+    <button class="bottom-nav-item" data-section="stats">
+      <i data-lucide="bar-chart-2"></i>
+      <span>Thống kê</span>
+    </button>
+    <button class="bottom-nav-item" data-section="settings">
+      <i data-lucide="settings"></i>
+      <span>Cài đặt</span>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main" id="adminMain">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbarDate"></span>
+        <div class="topbar-shop-status" id="topbarShopStatus"></div>
+      </div>
+    </div>
+
+    <!-- ======================== DASHBOARD ======================== -->
+    <section class="admin-section" id="secDashboard">
+      <div class="stat-cards-grid">
+        <div class="stat-card stat-card--orange">
+          <div class="stat-card-icon"><i data-lucide="shopping-bag"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="dashTotalOrders">0</div>
+            <div class="stat-card-label">Đơn hôm nay</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-card-icon"><i data-lucide="trending-up"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="dashRevenue">0đ</div>
+            <div class="stat-card-label">Doanh thu hôm nay</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--blue">
+          <div class="stat-card-icon"><i data-lucide="clock"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="dashPending">0</div>
+            <div class="stat-card-label">Chờ xử lý</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--brown">
+          <div class="stat-card-icon"><i data-lucide="check-circle-2"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="dashDone">0</div>
+            <div class="stat-card-label">Hoàn thành</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">Doanh thu 7 ngày gần nhất</div>
+          <div class="chart-container">
+            <canvas id="chartRevenue"></canvas>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Top 5 món bán chạy hôm nay</div>
+          <div id="dashTopItems" class="top-items-list"></div>
+        </div>
+      </div>
+
+      <div class="dash-card" style="margin-top:20px">
+        <div class="dash-card-title">Đơn hàng gần đây <span style="font-size:12px;color:var(--a-gray);font-weight:600">(10 đơn mới nhất)</span></div>
+        <div class="table-wrap">
+          <table class="admin-table" id="dashRecentOrders">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Món</th>
+                <th>Tổng</th>
+                <th>Trạng thái</th>
+                <th>Thời gian</th>
+              </tr>
+            </thead>
+            <tbody id="dashRecentOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== ORDERS ======================== -->
+    <section class="admin-section" id="secOrders" style="display:none">
+      <div class="section-toolbar">
+        <div class="toolbar-filters">
+          <div class="filter-tabs" id="orderStatusTabs">
+            <button class="filter-tab active" data-status="all">Tất cả</button>
+            <button class="filter-tab" data-status="pending">Chờ xác nhận</button>
+            <button class="filter-tab" data-status="processing">Đang làm</button>
+            <button class="filter-tab" data-status="done">Hoàn thành</button>
+            <button class="filter-tab" data-status="cancelled">Đã huỷ</button>
+          </div>
+          <div class="toolbar-search-row">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="orderSearch" placeholder="Tìm theo tên, SĐT..." />
+            </div>
+            <input type="date" id="orderDateFilter" class="date-input" title="Lọc theo ngày" />
+            <button class="icon-btn" id="refreshOrders" title="Làm mới">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Khách hàng</th>
+              <th>Loại</th>
+              <th>Món</th>
+              <th>Tổng tiền</th>
+              <th>Thanh toán</th>
+              <th>Trạng thái</th>
+              <th>Thời gian</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ======================== MENU ======================== -->
+    <section class="admin-section" id="secMenu" style="display:none">
+      <div class="section-toolbar">
+        <div class="filter-tabs" id="menuCatTabs">
+          <button class="filter-tab active" data-cat="all">Tất cả</button>
+          <button class="filter-tab" data-cat="hong-tra">🍵 Hồng Trà</button>
+          <button class="filter-tab" data-cat="tra-sua">🧋 Trà Sữa</button>
+          <button class="filter-tab" data-cat="luc-tra">🍃 Lục Trà</button>
+          <button class="filter-tab" data-cat="tra-trai-cay">🍹 Trà Trái Cây</button>
+          <button class="filter-tab" data-cat="soda">🥤 Soda</button>
+          <button class="filter-tab" data-cat="an-vat">🌯 Ăn Vặt</button>
+        </div>
+        <button class="primary-btn" id="addItemBtn">
+          <i data-lucide="plus"></i> Thêm món
+        </button>
+      </div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <!-- ======================== CATEGORIES ======================== -->
+    <section class="admin-section" id="secCategories" style="display:none">
+      <div class="section-toolbar">
+        <div class="section-toolbar-title">Quản lý danh mục</div>
+        <button class="primary-btn" id="addCatBtn">
+          <i data-lucide="plus"></i> Thêm danh mục
+        </button>
+      </div>
+      <div class="cat-list" id="catList"></div>
+    </section>
+
+    <!-- ======================== STATS ======================== -->
+    <section class="admin-section" id="secStats" style="display:none">
+      <div class="section-toolbar" style="flex-wrap:wrap;gap:12px">
+        <div class="filter-tabs" id="statsRangeTabs">
+          <button class="filter-tab active" data-range="today">Hôm nay</button>
+          <button class="filter-tab" data-range="7d">7 ngày</button>
+          <button class="filter-tab" data-range="30d">30 ngày</button>
+          <button class="filter-tab" data-range="custom">Tùy chọn</button>
+        </div>
+        <div class="custom-date-range" id="customDateRange" style="display:none">
+          <input type="date" id="statsDateFrom" class="date-input" />
+          <span style="color:var(--a-gray)">—</span>
+          <input type="date" id="statsDateTo" class="date-input" />
+          <button class="primary-btn" id="statsApplyDate">Áp dụng</button>
+        </div>
+      </div>
+      <div class="stat-cards-grid" style="margin-top:8px">
+        <div class="stat-card stat-card--orange">
+          <div class="stat-card-icon"><i data-lucide="trending-up"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="statsTotalRevenue">0đ</div>
+            <div class="stat-card-label">Tổng doanh thu</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-card-icon"><i data-lucide="shopping-bag"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="statsTotalOrders">0</div>
+            <div class="stat-card-label">Tổng đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--blue">
+          <div class="stat-card-icon"><i data-lucide="divide-circle"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="statsAvgOrder">0đ</div>
+            <div class="stat-card-label">Giá trị TB/đơn</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card--brown">
+          <div class="stat-card-icon"><i data-lucide="x-circle"></i></div>
+          <div class="stat-card-body">
+            <div class="stat-card-num" id="statsCancelRate">0%</div>
+            <div class="stat-card-label">Tỷ lệ huỷ đơn</div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-grid" style="margin-top:20px">
+        <div class="dash-card">
+          <div class="dash-card-title">Doanh thu theo ngày</div>
+          <div class="chart-container">
+            <canvas id="chartStats"></canvas>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Doanh thu theo danh mục</div>
+          <div class="chart-container chart-container--donut">
+            <canvas id="chartCats"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="dash-card" style="margin-top:20px">
+        <div class="dash-card-title">Top món theo doanh thu &amp; số lượng</div>
+        <div class="table-wrap">
+          <table class="admin-table" id="statsItemsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tên món</th>
+                <th>Danh mục</th>
+                <th>Số lượng</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+            <tbody id="statsItemsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== SETTINGS ======================== -->
+    <section class="admin-section" id="secSettings" style="display:none">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="settings-card-title"><i data-lucide="store"></i> Thông tin quán</div>
+          <div class="form-group">
+            <label>Tên quán</label>
+            <input type="text" id="setShopName" placeholder="VD: Trà Sữa Mẹ nấu" />
+          </div>
+          <div class="form-group">
+            <label>Địa chỉ</label>
+            <input type="text" id="setShopAddress" placeholder="VD: 123 Lê Lợi, Q.1, TP.HCM" />
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="text" id="setShopPhone" placeholder="VD: 0909 123 456" />
+          </div>
+          <div class="form-group">
+            <label>Giờ mở cửa</label>
+            <input type="text" id="setShopHours" placeholder="VD: 07:00 – 22:00 hàng ngày" />
+          </div>
+          <button class="primary-btn" id="saveShopInfo">
+            <i data-lucide="save"></i> Lưu thông tin
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title"><i data-lucide="toggle-left"></i> Trạng thái nhận đơn</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Đang nhận đơn</div>
+              <div class="toggle-sub" id="shopStatusText">Quán đang mở và nhận đơn hàng</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setIsOpen" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-note">
+            <i data-lucide="info"></i>
+            Khi tắt, trang đặt hàng sẽ hiển thị thông báo "Quán đang đóng cửa".
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title"><i data-lucide="lock"></i> Đổi mật khẩu</div>
+          <p style="font-size:13px;color:var(--a-gray);margin-bottom:16px;line-height:1.6">
+            Mặc định: <strong>admin123</strong>. Nên đổi sau lần đăng nhập đầu tiên.
+          </p>
+          <div class="form-group">
+            <label>Mật khẩu hiện tại</label>
+            <input type="password" id="oldPassword" placeholder="Nhập mật khẩu hiện tại" />
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu mới</label>
+            <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
+          </div>
+          <button class="primary-btn" id="savePassword">
+            <i data-lucide="save"></i> Đổi mật khẩu
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title"><i data-lucide="database"></i> Dữ liệu</div>
+          <p style="font-size:14px;color:var(--a-gray);margin-bottom:16px;line-height:1.6">
+            Xuất hoặc xoá dữ liệu đơn hàng và thực đơn khỏi localStorage.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="secondary-btn" id="exportData">
+              <i data-lucide="download"></i> Xuất dữ liệu (JSON)
+            </button>
+            <button class="danger-btn" id="resetOrders">
+              <i data-lucide="trash-2"></i> Xoá tất cả đơn hàng
+            </button>
+            <button class="danger-btn" id="resetMenu">
+              <i data-lucide="rotate-ccw"></i> Reset thực đơn về mặc định
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /admin-main -->
+</div><!-- /adminWrapper -->
+
+<!-- ======================== ORDER DETAIL MODAL ======================== -->
+<div class="modal-overlay admin-overlay" id="orderDetailOverlay">
+  <div class="modal-box modal-box--lg" id="orderDetailModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="orderDetailTitle">Chi tiết đơn hàng</h3>
+      <button class="modal-close-btn" id="orderDetailClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body" id="orderDetailBody"></div>
+    <div class="modal-footer" id="orderDetailFooter"></div>
+  </div>
+</div>
+
+<!-- ======================== ITEM FORM MODAL ======================== -->
+<div class="modal-overlay admin-overlay" id="itemFormOverlay">
+  <div class="modal-box" id="itemFormModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="itemFormTitle">Thêm món mới</h3>
+      <button class="modal-close-btn" id="itemFormClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div class="form-row">
+        <div class="form-group" style="flex:0 0 80px">
+          <label>Emoji</label>
+          <input type="text" id="fEmoji" placeholder="🧋" maxlength="4" class="emoji-input" />
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Tên món <span class="required">*</span></label>
+          <input type="text" id="fName" placeholder="VD: Trà Sữa Trân Châu" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mô tả ngắn <span class="required">*</span></label>
+        <input type="text" id="fDesc" placeholder="VD: Trân châu đen, trà ô long thơm" />
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label>Giá S (đ) <span style="font-weight:400;font-size:11px">(để trống nếu không có)</span></label>
+          <input type="number" id="fPriceS" placeholder="5000" min="0" step="1000" />
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Giá M (đ) <span class="required">*</span></label>
+          <input type="number" id="fPriceM" placeholder="10000" min="0" step="1000" />
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Giá L (đ) <span style="font-weight:400;font-size:11px">(để trống nếu không có)</span></label>
+          <input type="number" id="fPriceL" placeholder="15000" min="0" step="1000" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Danh mục <span class="required">*</span></label>
+        <select id="fCat" class="form-select">
+          <option value="hong-tra">🍵 Hồng Trà</option>
+          <option value="tra-sua">🧋 Trà Sữa</option>
+          <option value="luc-tra">🍃 Lục Trà</option>
+          <option value="tra-trai-cay">🍹 Trà Trái Cây</option>
+          <option value="soda">🥤 Soda</option>
+          <option value="an-vat">🌯 Ăn Vặt</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ảnh món <span style="font-weight:400;font-size:12px;text-transform:none">(tuỳ chọn)</span></label>
+        <input type="file" id="fImgFile" accept="image/*" style="display:none" />
+        <div class="img-upload-area" id="imgUploadArea">
+          <div class="img-upload-placeholder" id="imgUploadPlaceholder">
+            <i data-lucide="camera"></i>
+            <div class="img-upload-text">Chụp ảnh / Chọn từ thư viện</div>
+            <div class="img-upload-sub">JPG, PNG, WEBP – tối đa 5MB</div>
+          </div>
+          <div class="img-preview-wrap" id="imgPreviewWrap" style="display:none">
+            <img id="imgPreview" src="" alt="Preview" class="img-preview" />
+            <button type="button" class="img-remove-btn" id="imgRemove" title="Xoá ảnh">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row" style="padding:0;margin-bottom:0">
+        <label class="toggle-label" style="margin:0">Đang bán</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="fAvailable" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn" id="itemFormCancel">Huỷ</button>
+      <button class="primary-btn" id="itemFormSave"><i data-lucide="save"></i> Lưu món</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== CATEGORY FORM MODAL ======================== -->
+<div class="modal-overlay admin-overlay" id="catFormOverlay">
+  <div class="modal-box" id="catFormModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="catFormTitle">Thêm danh mục</h3>
+      <button class="modal-close-btn" id="catFormClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editCatId" />
+      <div class="form-row">
+        <div class="form-group" style="flex:0 0 80px">
+          <label>Icon</label>
+          <input type="text" id="cIcon" placeholder="🧋" maxlength="4" class="emoji-input" />
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Tên danh mục <span class="required">*</span></label>
+          <input type="text" id="cName" placeholder="VD: Trà sữa" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Key (không dấu, viết thường, dùng dấu -) <span class="required">*</span></label>
+        <input type="text" id="cKey" placeholder="VD: tra-sua" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn" id="catFormCancel">Huỷ</button>
+      <button class="primary-btn" id="catFormSave"><i data-lucide="save"></i> Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== PRINT BILL ======================== -->
+<div id="printBill" class="print-bill">
+  <div class="print-bill-header">
+    <div class="print-logo">🧋</div>
+    <div class="print-shop-name" id="printShopName">Trà Sữa Mẹ nấu</div>
+    <div class="print-shop-info" id="printShopInfo"></div>
+  </div>
+  <div class="print-divider"></div>
+  <div class="print-order-id" id="printOrderId"></div>
+  <div class="print-meta" id="printMeta"></div>
+  <div class="print-divider"></div>
+  <table class="print-items" id="printItems"></table>
+  <div class="print-divider"></div>
+  <div class="print-totals" id="printTotals"></div>
+  <div class="print-divider"></div>
+  <div class="print-footer">Cảm ơn quý khách! Hẹn gặp lại 🌟</div>
+</div>
+
+<!-- TOAST -->
+<div class="a-toast" id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

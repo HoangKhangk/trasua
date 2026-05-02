@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quán Nước – Đặt Hàng Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+
+      <div class="logo">
+        <span class="logo-icon">🧋</span>
+        <span class="logo-text">Trà Sữa Mẹ nấu</span>
+      </div>
+      <a href="admin.html" class="admin-link" title="Quản lý quán"><i data-lucide="settings"></i></a>
+      <button class="cart-btn" id="cartBtn" aria-label="Giỏ hàng">
+        <i data-lucide="shopping-cart" class="cart-icon"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-sub">Tươi mát • Ngon lành • Giao nhanh</p>
+      <h1 class="hero-title">Đặt nước<br><em>ngay tại đây</em></h1>
+      <a href="#menu" class="hero-cta">Xem thực đơn ↓</a>
+    </div>
+    <div class="hero-blobs">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+  </section>
+
+  <!-- CATEGORY TABS -->
+  <nav class="categories" id="menu">
+    <div class="container">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-cat="all"><i data-lucide="layout-grid"></i> Tất cả</button>
+        <button class="tab" data-cat="hong-tra">🍵 Hồng Trà</button>
+        <button class="tab" data-cat="tra-sua">🧋 Trà Sữa</button>
+        <button class="tab" data-cat="luc-tra">🍃 Lục Trà</button>
+        <button class="tab" data-cat="tra-trai-cay">🍹 Trà Trái Cây</button>
+        <button class="tab" data-cat="soda">🥤 Soda</button>
+        <button class="tab" data-cat="an-vat">🌯 Ăn Vặt</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MENU GRID -->
+  <main class="menu-section">
+    <div class="container">
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+  </main>
+
+  <!-- CART SIDEBAR -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h2><i data-lucide="shopping-cart" class="cart-header-icon"></i> Giỏ hàng</h2>
+      <button class="close-cart" id="closeCart"><i data-lucide="x"></i></button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="cart-empty">Chưa có món nào 🥺</p>
+    </div>
+    <div class="cart-footer" id="cartFooter">
+      <div class="cart-total">
+        <span>Tổng cộng:</span>
+        <strong id="cartTotal">0đ</strong>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn">Đặt hàng ngay 🎉</button>
+    </div>
+  </aside>
+
+  <!-- ORDER FORM MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="orderModal">
+      <button class="modal-close" id="modalClose"><i data-lucide="x"></i></button>
+      <div class="modal-img-wrap">
+        <img id="modalImg" src="" alt="" class="modal-item-img" loading="lazy">
+        <div class="modal-img-overlay"></div>
+      </div>
+      <h3 id="modalName"></h3>
+      <p class="modal-base-price" id="modalPrice"></p>
+
+      <div class="option-group">
+        <label>Size</label>
+        <div class="option-btns" id="sizeOptions"></div>
+      </div>
+
+      <div class="option-group">
+        <label>Độ ngọt</label>
+        <div class="option-btns" id="sugarOptions">
+          <button class="opt-btn active" data-val="Ngọt">Ngọt</button>
+          <button class="opt-btn" data-val="Ít ngọt">Ít ngọt</button>
+          <button class="opt-btn" data-val="Không đường">Không đường</button>
+        </div>
+      </div>
+
+      <div class="option-group">
+        <label>Đá</label>
+        <div class="option-btns" id="iceOptions">
+          <button class="opt-btn active" data-val="Nhiều đá">Nhiều</button>
+          <button class="opt-btn" data-val="Ít đá">Ít</button>
+          <button class="opt-btn" data-val="Không đá">Không</button>
+        </div>
+      </div>
+
+      <div class="option-group">
+        <label>Chọn thạch <span class="option-sub">Chọn tối đa 1 · Miễn phí</span></label>
+        <div class="topping-list" id="toppingFreeList"></div>
+      </div>
+
+      <div class="option-group">
+        <label>Thêm Topping <span class="option-sub">Chọn tối đa 4</span></label>
+        <div class="topping-list" id="toppingPaidList"></div>
+      </div>
+
+      <div class="qty-row">
+        <button class="qty-btn" id="qtyMinus">−</button>
+        <span id="qtyVal">1</span>
+        <button class="qty-btn" id="qtyPlus">+</button>
+      </div>
+
+      <button class="add-to-cart-btn" id="addToCartBtn">
+        <span>Thêm vào giỏ</span>
+        <span id="modalTotalPrice"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BACK TO TOP -->
+  <button class="back-to-top" id="backToTop" aria-label="Lên đầu trang">
+    <i data-lucide="chevron-up"></i>
+  </button>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

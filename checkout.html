@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanh toán – Trà Sữa Mẹ nấu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-header-inner">
+      <a href="index.html" class="back-btn"><i data-lucide="arrow-left"></i></a>
+      <span class="page-header-title">Thanh toán</span>
+      <div style="width:36px"></div>
+    </div>
+  </header>
+
+  <!-- CHECKOUT CONTENT -->
+  <main class="ck-page" id="ckPage">
+
+    <!-- Order Summary -->
+    <section class="ck-section">
+      <h2 class="ck-section-title">
+        <i data-lucide="shopping-bag" class="ck-title-icon"></i> Đơn hàng của bạn
+      </h2>
+      <div id="ckItems" class="ck-items"></div>
+      <div class="ck-divider"></div>
+      <div class="ck-subtotal-row">
+        <span>Tạm tính</span>
+        <strong id="ckSubtotal">0đ</strong>
+      </div>
+      <div class="ck-subtotal-row">
+        <span>Phí giao hàng</span>
+        <strong class="ck-free">Miễn phí 🎁</strong>
+      </div>
+    </section>
+
+    <!-- Order Info -->
+    <section class="ck-section">
+      <h2 class="ck-section-title">
+        <i data-lucide="clipboard-list" class="ck-title-icon"></i> Thông tin đặt hàng
+      </h2>
+
+      <!-- Order type toggle -->
+      <div class="order-type-wrap">
+        <button class="order-type-btn active" data-type="dine-in">
+          <i data-lucide="utensils"></i> Tại bàn
+        </button>
+        <button class="order-type-btn" data-type="delivery">
+          <i data-lucide="truck"></i> Giao hàng
+        </button>
+      </div>
+
+      <!-- Table number (dine-in only) -->
+      <div class="form-group" id="tableGroup">
+        <label>Số bàn</label>
+        <input type="text" id="ckTable" placeholder="VD: Bàn 5, Bàn A1..." />
+      </div>
+
+      <!-- Customer info (always visible) -->
+      <div class="form-group">
+        <label>Tên khách hàng</label>
+        <input type="text" id="ckName" placeholder="Nguyễn Văn A" />
+      </div>
+      <div class="form-group">
+        <label>Số điện thoại</label>
+        <input type="tel" id="ckPhone" placeholder="0909 xxx xxx" />
+      </div>
+
+      <!-- Address (delivery only) -->
+      <div class="form-group" id="addressGroup" style="display:none">
+        <label>Địa chỉ giao hàng</label>
+        <input type="text" id="ckAddress" placeholder="123 Đường ABC, Q.1" />
+      </div>
+
+      <div class="form-group">
+        <label>Ghi chú <span style="font-weight:400;text-transform:none">(tuỳ chọn)</span></label>
+        <textarea id="ckNote" placeholder="Ít đường, thêm trân châu..."></textarea>
+      </div>
+    </section>
+
+    <!-- Payment Method -->
+    <section class="ck-section">
+      <h2 class="ck-section-title">
+        <i data-lucide="credit-card" class="ck-title-icon"></i> Phương thức thanh toán
+      </h2>
+      <div class="pay-methods">
+        <label class="pay-method active">
+          <input type="radio" name="pay" value="cod" checked hidden />
+          <i data-lucide="wallet" class="pay-icon"></i>
+          <div class="pay-text">
+            <div class="pay-name">Thanh toán khi nhận hàng</div>
+            <div class="pay-sub">COD – tiền mặt</div>
+          </div>
+          <i data-lucide="check-circle-2" class="pay-check"></i>
+        </label>
+        <label class="pay-method">
+          <input type="radio" name="pay" value="bank" hidden />
+          <i data-lucide="landmark" class="pay-icon"></i>
+          <div class="pay-text">
+            <div class="pay-name">Chuyển khoản ngân hàng</div>
+            <div class="pay-sub">Momo / VietQR</div>
+          </div>
+          <i data-lucide="check-circle-2" class="pay-check"></i>
+        </label>
+      </div>
+      <div class="bank-info" id="bankInfo">
+        <p class="bank-title"><i data-lucide="info" style="width:13px;height:13px;vertical-align:-2px"></i> Thông tin chuyển khoản</p>
+        <div class="bank-row"><span>Ngân hàng</span><strong>Vietcombank</strong></div>
+        <div class="bank-row"><span>Số tài khoản</span><strong>0123456789</strong></div>
+        <div class="bank-row"><span>Chủ tài khoản</span><strong>TRAN SUA ME NAU</strong></div>
+        <div class="bank-row"><span>Nội dung CK</span><strong id="bankRef">DH-...</strong></div>
+        <p class="bank-note">⚡ Đơn sẽ được xử lý sau khi xác nhận thanh toán</p>
+      </div>
+    </section>
+
+    <div style="height:130px"></div>
+  </main>
+
+  <!-- FIXED BOTTOM BAR -->
+  <div class="ck-bar">
+    <div class="ck-bar-info">
+      <span class="ck-bar-label">Tổng cộng</span>
+      <strong class="ck-bar-total" id="ckTotal">0đ</strong>
+    </div>
+    <button class="checkout-btn ck-confirm-btn" id="ckSubmit">
+      Đặt hàng <i data-lucide="arrow-right" style="width:15px;height:15px;vertical-align:-2px"></i>
+    </button>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-inner">
+      <div class="success-anim">🎉</div>
+      <h2 class="success-title">Đặt hàng thành công!</h2>
+      <p class="success-msg">Cảm ơn bạn đã tin tưởng quán mình nha~<br>Đơn sẽ được giao trong <strong>30–45 phút</strong> 🚀</p>
+      <div class="success-order-id" id="successId"></div>
+      <a href="index.html" class="checkout-btn" style="display:block;text-align:center;text-decoration:none;margin-top:24px">
+        Về trang chủ
+      </a>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
