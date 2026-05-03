@@ -1116,6 +1116,18 @@ if (document.getElementById('adminLogin')) {
       );
     }
 
+    // Mobile (≤768px): dùng card list thay cho bảng
+    if (window.innerWidth <= 768) {
+      renderOrdersCards(orders);
+      return;
+    }
+
+    // Desktop: ẩn card list nếu có, hiện lại bảng
+    const _cardsList = document.getElementById('orderCardsList');
+    if (_cardsList) _cardsList.style.display = 'none';
+    const _tableWrap = document.querySelector('#secOrders .table-wrap');
+    if (_tableWrap) _tableWrap.style.display = '';
+
     const tbody = document.getElementById('ordersTableBody');
     if (!tbody) return;
 
@@ -1162,6 +1174,79 @@ if (document.getElementById('adminLogin')) {
     });
 
     lucide.createIcons();
+  }
+
+  /* --- ORDERS CARD LIST (mobile ≤768px) --- */
+  function renderOrdersCards(orders) {
+    const tableWrap = document.querySelector('#secOrders .table-wrap');
+    if (tableWrap) tableWrap.style.display = 'none';
+
+    let cardsList = document.getElementById('orderCardsList');
+    if (!cardsList) {
+      cardsList = document.createElement('div');
+      cardsList.id        = 'orderCardsList';
+      cardsList.className = 'order-cards-list';
+      document.getElementById('secOrders').appendChild(cardsList);
+    }
+    cardsList.style.display = 'flex';
+
+    if (!orders.length) {
+      cardsList.innerHTML = '<p style="text-align:center;color:var(--a-gray);padding:28px 0">Không tìm thấy đơn hàng nào.</p>';
+      return;
+    }
+
+    cardsList.innerHTML = orders.map(o => {
+      const typeLabel = o.orderType === 'dine-in'
+        ? `🪑 ${o.tableNumber ? 'Bàn ' + escHtml(o.tableNumber) : 'Tại bàn'}`
+        : '🚚 Giao hàng';
+
+      const shownItems   = o.items.slice(0, 2).map(i => escHtml(i.name));
+      const remaining    = o.items.length - 2;
+      const itemsSummary = shownItems.join(', ') + (remaining > 0 ? ` <span class="order-card-more">+${remaining} món</span>` : '');
+
+      return `
+        <div class="order-card">
+          <div class="order-card-header">
+            <span class="order-card-id">#${escHtml(o.id)}</span>
+            <span class="order-card-type">${typeLabel}</span>
+          </div>
+          <div class="order-card-meta">${escHtml(o.customer.name)}${o.customer.phone ? ' · ' + escHtml(o.customer.phone) : ''}</div>
+          <div class="order-card-items">${itemsSummary}</div>
+          <div class="order-card-footer">
+            <span class="order-card-total">${fmt(o.total)}</span>
+            <span class="status-badge ${escHtml(o.status)}">${STATUS_LABEL[o.status]}</span>
+          </div>
+          <div class="order-card-actions">${getOrderActionsMobile(o.id, o.status)}</div>
+        </div>
+      `;
+    }).join('');
+
+    cardsList.querySelectorAll('[data-order-action]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const { orderId, orderAction } = btn.dataset;
+        if (orderAction === 'view')       openOrderDetail(orderId);
+        else if (orderAction === 'print') printOrder(orderId);
+        else                              updateOrderStatus(orderId, orderAction);
+      });
+    });
+
+    lucide.createIcons();
+  }
+
+  function getOrderActionsMobile(id, status) {
+    const eid = escHtml(id);
+    let html = `<button class="order-action-btn order-action-btn--view" data-order-action="view" data-order-id="${eid}"><i data-lucide="eye"></i> Xem</button>`;
+    if (status === 'pending') {
+      html += `<button class="order-action-btn order-action-btn--start" data-order-action="processing" data-order-id="${eid}"><i data-lucide="flame"></i> Bắt đầu</button>`;
+    }
+    if (status === 'processing') {
+      html += `<button class="order-action-btn order-action-btn--done" data-order-action="done" data-order-id="${eid}"><i data-lucide="check"></i> Xong</button>`;
+    }
+    if (status === 'pending' || status === 'processing') {
+      html += `<button class="order-action-btn order-action-btn--cancel" data-order-action="cancelled" data-order-id="${eid}"><i data-lucide="x"></i> Huỷ</button>`;
+    }
+    return html;
   }
 
   function getOrderActions(id, status) {
