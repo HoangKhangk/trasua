@@ -196,8 +196,8 @@ if (document.getElementById('cartBtn')) {
   let currentItem = null;
   let currentQty  = 1;
   let activeCategory      = 'all';
-  let selectedFreeTopping = null;
-  let selectedPaidToppings = [];
+  let selectedFreeTopping  = [];   // array id thạch được chọn (nhiều)
+  let selectedPaidToppings = {};   // object { id: qty } cho topping paid
 
   function renderMenu() {
     const grid  = document.getElementById('menuGrid');
@@ -253,7 +253,7 @@ if (document.getElementById('cartBtn')) {
         <span class="topping-price">Miễn phí</span>
         <span class="topping-chk-wrap">
           <input type="checkbox" class="topping-native-chk" data-id="${t.id}"
-            ${selectedFreeTopping === t.id ? 'checked' : ''}>
+            ${selectedFreeTopping.includes(t.id) ? 'checked' : ''}>
           <span class="topping-chk-custom"></span>
         </span>
       </label>
@@ -261,41 +261,56 @@ if (document.getElementById('cartBtn')) {
 
     list.querySelectorAll('.topping-native-chk').forEach(inp => {
       inp.addEventListener('change', () => {
-        selectedFreeTopping = inp.checked ? inp.dataset.id : null;
-        renderToppingFree();
+        const id = inp.dataset.id;
+        if (inp.checked) {
+          if (!selectedFreeTopping.includes(id)) selectedFreeTopping.push(id);
+        } else {
+          selectedFreeTopping = selectedFreeTopping.filter(x => x !== id);
+        }
         updateModalTotal();
       });
     });
   }
 
   function renderToppingPaid() {
-    const list       = document.getElementById('toppingPaidList');
-    const maxReached = selectedPaidToppings.length >= 4;
+    const list = document.getElementById('toppingPaidList');
 
     list.innerHTML = TOPPINGS_PAID.map(t => {
-      const checked  = selectedPaidToppings.includes(t.id);
-      const disabled = !checked && maxReached;
+      const qty    = selectedPaidToppings[t.id] || 0;
+      const hasQty = qty > 0;
       return `
-        <label class="topping-row${disabled ? ' is-disabled' : ''}">
+        <div class="topping-row" style="${hasQty ? 'background:rgba(247,127,58,.08)' : ''}">
           <span class="topping-name">${t.name}</span>
           <span class="topping-price">+${fmt(t.price)}</span>
-          <span class="topping-chk-wrap">
-            <input type="checkbox" class="topping-native-chk" data-id="${t.id}"
-              ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
-            <span class="topping-chk-custom"></span>
-          </span>
-        </label>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <button class="cart-qty-btn tp-minus" data-id="${t.id}"
+              style="width:28px;height:28px;font-size:16px;font-weight:800${qty===0?';opacity:.3;cursor:not-allowed':''}"
+              ${qty === 0 ? 'disabled' : ''}>−</button>
+            <span style="min-width:28px;text-align:center;font-size:15px;font-weight:800;color:var(--brown)">${qty}</span>
+            <button class="cart-qty-btn tp-plus" data-id="${t.id}"
+              style="width:28px;height:28px;font-size:16px;font-weight:800">+</button>
+          </div>
+        </div>
       `;
     }).join('');
 
-    list.querySelectorAll('.topping-native-chk').forEach(inp => {
-      inp.addEventListener('change', () => {
-        const id = inp.dataset.id;
-        if (inp.checked) {
-          if (!selectedPaidToppings.includes(id)) selectedPaidToppings.push(id);
-        } else {
-          selectedPaidToppings = selectedPaidToppings.filter(x => x !== id);
+    list.querySelectorAll('.tp-minus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id  = btn.dataset.id;
+        const cur = selectedPaidToppings[id] || 0;
+        if (cur > 0) {
+          selectedPaidToppings[id] = cur - 1;
+          if (selectedPaidToppings[id] === 0) delete selectedPaidToppings[id];
         }
+        renderToppingPaid();
+        updateModalTotal();
+      });
+    });
+
+    list.querySelectorAll('.tp-plus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        selectedPaidToppings[id] = (selectedPaidToppings[id] || 0) + 1;
         renderToppingPaid();
         updateModalTotal();
       });
@@ -309,8 +324,8 @@ if (document.getElementById('cartBtn')) {
   function openItemModal(id) {
     currentItem          = getMenu().find(m => m.id === id);
     currentQty           = 1;
-    selectedFreeTopping  = null;
-    selectedPaidToppings = [];
+    selectedFreeTopping  = [];
+    selectedPaidToppings = {};
 
     const imgEl = document.getElementById('modalImg');
     imgEl.src   = getImgSrc(currentItem);
@@ -357,16 +372,16 @@ if (document.getElementById('cartBtn')) {
   function closeItemModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.body.style.overflow = '';
-    selectedFreeTopping  = null;
-    selectedPaidToppings = [];
+    selectedFreeTopping  = [];
+    selectedPaidToppings = {};
   }
 
   function calcItemPrice() {
     const sizeKey      = getSelectedOpt('sizeOptions')?.val || Object.keys(currentItem.prices || { M: 0 })[0];
     const basePrice    = (currentItem.prices || {})[sizeKey] || 0;
-    const toppingExtra = selectedPaidToppings.reduce((s, id) => {
+    const toppingExtra = Object.entries(selectedPaidToppings).reduce((s, [id, qty]) => {
       const t = TOPPINGS_PAID.find(x => x.id === id);
-      return s + (t ? t.price : 0);
+      return s + (t ? t.price * qty : 0);
     }, 0);
     return (basePrice + toppingExtra) * currentQty;
   }
@@ -405,9 +420,9 @@ if (document.getElementById('cartBtn')) {
 
     const sizeKey      = sizeData?.val || Object.keys(currentItem.prices || { M: 0 })[0];
     const basePrice    = (currentItem.prices || {})[sizeKey] || 0;
-    const toppingExtra = selectedPaidToppings.reduce((s, id) => {
+    const toppingExtra = Object.entries(selectedPaidToppings).reduce((s, [id, qty]) => {
       const t = TOPPINGS_PAID.find(x => x.id === id);
-      return s + (t ? t.price : 0);
+      return s + (t ? t.price * qty : 0);
     }, 0);
     const unitPrice = basePrice + toppingExtra;
 
@@ -420,10 +435,13 @@ if (document.getElementById('cartBtn')) {
       sugar: sugarData?.val || 'Ngọt',
       ice:   iceData?.val   || 'Nhiều đá',
       toppings_free: selectedFreeTopping
-        ? [TOPPINGS_FREE.find(t => t.id === selectedFreeTopping)?.name].filter(Boolean)
-        : [],
-      toppings_paid: selectedPaidToppings
-        .map(id => TOPPINGS_PAID.find(t => t.id === id)?.name)
+        .map(id => TOPPINGS_FREE.find(t => t.id === id)?.name)
+        .filter(Boolean),
+      toppings_paid: Object.entries(selectedPaidToppings)
+        .map(([id, qty]) => {
+          const t = TOPPINGS_PAID.find(x => x.id === id);
+          return t ? (qty > 1 ? `${t.name} x${qty}` : t.name) : null;
+        })
         .filter(Boolean),
       unitPrice,
       qty:   currentQty,
