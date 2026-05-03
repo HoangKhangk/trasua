@@ -895,7 +895,7 @@ body.admin-page { background: var(--a-bg); }
 .sidebar-logout-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 .sidebar-logout-btn:hover { background: rgba(229,57,53,.2); color: #ff8a80; }
 
-.hamburger { display: none; position: fixed; top: 14px; left: 14px; z-index: 250; width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--a-sidebar-bg); color: var(--white); align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); }
+.hamburger { display: none !important; position: fixed; top: 14px; left: 14px; z-index: 250; width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--a-sidebar-bg); color: var(--white); align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); }
 .hamburger svg { width: 20px; height: 20px; }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 190; opacity: 0; pointer-events: none; transition: opacity var(--transition); backdrop-filter: blur(2px); }
 .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
@@ -1314,7 +1314,7 @@ body.admin-page { background: var(--a-bg); }
   .sidebar-overlay { display: block; }
   .hamburger       { display: flex; }
   .admin-main { margin-left: 0; padding-bottom: 72px; }
-  .topbar { padding: 0 16px 0 60px; height: 54px; }
+  .topbar { padding: 0 16px; height: 54px; }
   .topbar-title { font-size: 16px; }
   .topbar-date  { display: none; }
   .topbar-shop-status { font-size: 11px; }
